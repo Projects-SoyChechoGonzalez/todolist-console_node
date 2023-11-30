@@ -40,11 +40,30 @@ const questions = [
 ];
 
 export const inquirerMenu = async () => {
-	// console.clear();
-	
 	console.log('==========================='.green);
 	console.log('   Seleccione una opción   '.green);
 	console.log('===========================\n'.green);
+	
+	const {option} = await inquirer.prompt(questions);
+	return option;
+};
+
+export const inquirerTaskList = async (taskListChoices) => {
+	console.log('==========================='.green);
+	console.log('   Seleccione una opción   '.green);
+	console.log('===========================\n'.green);
+	
+	const questions = [
+		{
+			type: 'list',
+			name: 'option',
+			message: 'Seleccione una opción:',
+			choices: taskListChoices.map((tarea, index) => ({
+				value: tarea.id,
+				name: `${index + 1}. ${tarea.description}`,
+			})),
+		},
+	];
 	
 	const {option} = await inquirer.prompt(questions);
 	return option;
