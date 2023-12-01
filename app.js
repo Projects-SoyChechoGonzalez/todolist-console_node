@@ -1,10 +1,31 @@
+import express from 'express';
+// import path from 'path';
+// import {fileURLToPath} from 'url';
+import fs from 'fs';
 import 'colors';
 import {inquirerMenu, inquirerTaskList, pause, readInput} from './helpers/inquirer.js';
 import Tareas from './models/tareas.js';
+import {saveDB} from './helpers/saveFile.js';
+
+// const __filename = path.dirname(fileURLToPath(import.meta.url));
+const app = express();
+
+
+export const loadDB = () => {
+	const file = './db/data.json';
+	try {
+		const data = fs.readFileSync(file, 'utf8');
+		return JSON.parse(data);
+	} catch (error) {
+		return [];
+	}
+};
 
 const main = async () => {
 	let opt = '';
-	const tareas = new Tareas();
+	// const tareas = new Tareas(loadDB());
+	
+	const tareas = new Tareas(loadDB());
 	
 	do {
 		opt = await inquirerMenu();
@@ -59,8 +80,22 @@ const main = async () => {
 				break;
 		}
 		
+		saveDB(tareas.arrayList);
+		
 		await pause();
 	} while (opt !== '0');
 };
+
+
+app.get('/', (req, res) => {
+	const tareas = loadDB();
+	res.json(tareas);
+});
+
+
+app.listen(3000, () => {
+	console.log('Servidor corriendo en puerto 3000'.green);
+});
+
 
 main();
