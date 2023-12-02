@@ -5,7 +5,9 @@ import fs from 'fs';
 import 'colors';
 import {inquirerMenu, inquirerTaskList, pause, readInput} from './helpers/inquirer.js';
 import Tareas from './models/tareas.js';
-import {saveDB} from './helpers/saveFile.js';
+
+import listViewRouter from './routes/list-view-router.js';
+import listEditRouter from './routes/list-edit-router.js';
 
 // const __filename = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -21,11 +23,15 @@ export const loadDB = () => {
 	}
 };
 
+export const saveDB = (data) => {
+	const file = './db/data.json';
+	fs.writeFileSync(file, JSON.stringify(data));
+};
+
+const tareas = new Tareas(loadDB());
+
 const main = async () => {
 	let opt = '';
-	// const tareas = new Tareas(loadDB());
-	
-	const tareas = new Tareas(loadDB());
 	
 	do {
 		opt = await inquirerMenu();
@@ -86,12 +92,9 @@ const main = async () => {
 	} while (opt !== '0');
 };
 
-
-app.get('/', (req, res) => {
-	const tareas = loadDB();
-	res.json(tareas);
-});
-
+app.use(express.json());
+app.use('/', listViewRouter);
+app.use('/', listEditRouter);
 
 app.listen(3000, () => {
 	console.log('Servidor corriendo en puerto 3000'.green);
